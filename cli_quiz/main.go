@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -14,6 +15,10 @@ func main() {
 	// default file is "problems.csv"
 	var csvFilename string
 	flag.StringVar(&csvFilename, "csv", "problems.csv", "a csv file with questions and answer in two columns")
+
+	var timeLimit int
+	flag.IntVar(&timeLimit, "limit", 30, "time limit for the quiz in seconds")
+
 	flag.Parse()
 
 	fmt.Println(reflect.TypeOf(csvFilename))
@@ -22,16 +27,31 @@ func main() {
 
 	problems := parseLines(all_lines)
 
+	//create a timer
+	timer := time.NewTimer(time.Duration(timeLimit) * time.Second)
+
 	correct := 0
 	// loop through all the problems
 	for i, p := range problems {
 		fmt.Printf("Problem Number %d=%s \n", i+1, p.q)
-		var answer string
-		fmt.Scanf("%s\n", &answer)
+		answerCh := make(chan string)
+		//declare a go routine
+		go func() {
+			var answer string
+			fmt.Scanf("%s\n", &answer)
+			// set the answer to the channel from the routine
+			answerCh <- answer
+		}()
 
-		if answer == p.a {
-			correct += 1
-			fmt.Printf("Correct!")
+		select {
+		case <-timer.C:
+			fmt.Printf("You Scored %d out of %d", correct, len(problems))
+			return
+		case answer := <-answerCh:
+			if answer == p.a {
+				correct += 1
+				fmt.Printf("Correct!")
+			}
 		}
 	}
 
