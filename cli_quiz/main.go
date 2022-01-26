@@ -18,9 +18,9 @@ func main() {
 
 	fmt.Println(reflect.TypeOf(csvFilename))
 
-	lines := read_csv(csvFilename)
+	all_lines := read_csv(csvFilename)
 
-	problems := parseLines(lines)
+	problems := parseLines(all_lines)
 
 	correct := 0
 	// loop through all the problems

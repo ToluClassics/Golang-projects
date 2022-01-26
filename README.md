@@ -1,2 +1,2 @@
 # Golang-projects
-Putting together a list of mid level projects in Go
+Putting together a list of beginner to mid level projects in Go
